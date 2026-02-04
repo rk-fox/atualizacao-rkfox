@@ -85,7 +85,7 @@ export const EfficiencyCalc: React.FC = () => {
         const newTotalPower = currentMiners * (1 + currentBonusPercent);
         const finalPowerChange = newTotalPower - initialStats.totalPower;
 
-        const effMiner = bP > 0 ? custoRLT / (bP / 1000000) : 0;
+        const effMiner = bP > 0 ? custoRLT / ((bP * (1 + bB)) / 1000000) : 0;
         const effPower = finalPowerChange > 0 ? custoRLT / (finalPowerChange / 1000000) : 0;
 
         let conclusao = '';
