@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, Mail, Globe, MessageCircle, ChevronLeft } from 'lucide-react';
+import { Moon, Sun, Mail, Globe, MessageCircle, ChevronLeft, Youtube } from 'lucide-react';
 import { Banner } from './Banner';
 
 interface LayoutProps {
@@ -94,14 +94,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                     {/* Social Icons (Optional but fits visual) */}
                     <div className="flex gap-4">
-                        <a href="#" className="p-3 bg-slate-100 dark:bg-slate-700 rounded-full hover:bg-blue-600 hover:text-white transition-all text-slate-600 dark:text-slate-300">
+                        <a href="/" className="p-3 bg-slate-100 dark:bg-slate-700 rounded-full hover:bg-blue-600 hover:text-white transition-all text-slate-600 dark:text-slate-300">
                             <Globe size={20} />
                         </a>
                         <a href="#" className="p-3 bg-slate-100 dark:bg-slate-700 rounded-full hover:bg-blue-600 hover:text-white transition-all text-slate-600 dark:text-slate-300">
-                            <MessageCircle size={20} />
-                        </a>
-                        <a href="#" className="p-3 bg-slate-100 dark:bg-slate-700 rounded-full hover:bg-blue-600 hover:text-white transition-all text-slate-600 dark:text-slate-300">
-                            <Mail size={20} />
+                            <Youtube size={20} />
                         </a>
                     </div>
 

@@ -125,7 +125,7 @@ export const EfficiencyCalc: React.FC = () => {
                                 value={userLink}
                                 onChange={(e) => setUserLink(e.target.value)}
                                 className="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-bold outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
-                                placeholder="ID do Perfil / Link"
+                                placeholder="Link do Perfil (apenas a parte após o /p/)"
                             />
                         </div>
                     </div>
@@ -141,19 +141,19 @@ export const EfficiencyCalc: React.FC = () => {
                 {initialStats.miners > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-slate-100 dark:border-slate-700">
                         <div className="text-center">
-                            <p className="text-[10px] font-black text-slate-400 uppercase">Poder Base</p>
+                            <p className="text-xs font-black text-slate-400 uppercase">Poder Base</p>
                             <p className="text-lg font-black dark:text-white">{convertPower(initialStats.miners)}</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-[10px] font-black text-slate-400 uppercase">Bônus Atual</p>
+                            <p className="text-xs font-black text-slate-400 uppercase">Bônus Atual</p>
                             <p className="text-lg font-black text-blue-500">{(initialStats.bonusPercent * 100).toFixed(2)}%</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-[10px] font-black text-slate-400 uppercase">Poder do Bônus</p>
+                            <p className="text-xs font-black text-slate-400 uppercase">Poder do Bônus</p>
                             <p className="text-lg font-black dark:text-white">{convertPower(initialStats.miners * initialStats.bonusPercent)}</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-[10px] font-black text-slate-400 uppercase">Poder Total</p>
+                            <p className="text-xs font-black text-slate-400 uppercase">Poder Total</p>
                             <p className="text-lg font-black text-emerald-600">{convertPower(initialStats.totalPower)}</p>
                         </div>
                     </div>
@@ -164,14 +164,14 @@ export const EfficiencyCalc: React.FC = () => {
                 {/* Simulation Inputs */}
                 <div className="space-y-6">
                     <div className="bg-white dark:bg-dark-800 p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700">
-                        <h3 className="text-sm font-black uppercase text-slate-800 dark:text-white mb-8 flex items-center gap-2">
+                        <h3 className="text-lg font-black uppercase text-slate-800 dark:text-white mb-8 flex items-center gap-2">
                             <Calculator size={18} className="text-emerald-500" /> Simular Troca
                         </h3>
 
                         <div className="space-y-8">
                             {/* Sell Section */}
                             <div className="space-y-4">
-                                <p className="text-[10px] font-black text-red-500 uppercase flex items-center gap-2">
+                                <p className="text-sm font-black text-red-500 uppercase flex items-center gap-2">
                                     <TrendingDown size={14} /> O que você vai PERDER (Venda)
                                 </p>
                                 <div className="grid grid-cols-2 gap-4">
@@ -198,7 +198,7 @@ export const EfficiencyCalc: React.FC = () => {
 
                             {/* Buy Section */}
                             <div className="space-y-4">
-                                <p className="text-[10px] font-black text-emerald-500 uppercase flex items-center gap-2">
+                                <p className="text-sm font-black text-emerald-500 uppercase flex items-center gap-2">
                                     <TrendingUp size={14} /> O que você vai GANHAR (Compra)
                                 </p>
                                 <div className="grid grid-cols-2 gap-4">
@@ -225,7 +225,7 @@ export const EfficiencyCalc: React.FC = () => {
 
                             {/* Cost Section */}
                             <div className="pt-4">
-                                <label className="block text-[10px] font-black uppercase text-slate-500 mb-2">Custo Líquido da Operação (RLT)</label>
+                                <label className="block text-sm font-black uppercase text-slate-500 mb-2">Custo Líquido da Operação (RLT)</label>
                                 <div className="relative">
                                     <DollarSign size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                     <input
@@ -292,7 +292,7 @@ export const EfficiencyCalc: React.FC = () => {
                                     <div className="p-4 bg-white/5 rounded-xl flex items-start gap-3">
                                         <Info size={16} className="text-blue-400 mt-0.5" />
                                         <p className="text-[10px] opacity-70 leading-relaxed">
-                                            A eficiência real considera a perda de bônus da venda e o ganho de bônus da compra. Mantenha abaixo de 35 para crescimento saudável.
+                                            A eficiência real considera a perda de bônus da venda e o ganho de bônus da compra. A eficiência bruta considera apenas o poder e bônus da miner sem o impacto na conta.
                                         </p>
                                     </div>
                                 </div>
