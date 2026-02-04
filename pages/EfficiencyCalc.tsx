@@ -85,8 +85,8 @@ export const EfficiencyCalc: React.FC = () => {
         const newTotalPower = currentMiners * (1 + currentBonusPercent);
         const finalPowerChange = newTotalPower - initialStats.totalPower;
 
-        const effMiner = bP > 0 ? custoRLT / (bP / 1000) : 0;
-        const effPower = finalPowerChange > 0 ? custoRLT / (finalPowerChange / 1000) : 0;
+        const effMiner = bP > 0 ? custoRLT / (bP / 1000000) : 0;
+        const effPower = finalPowerChange > 0 ? custoRLT / (finalPowerChange / 1000000) : 0;
 
         let conclusao = '';
         if (effPower > 0) {
@@ -111,7 +111,7 @@ export const EfficiencyCalc: React.FC = () => {
                     <TrendingUp size={32} />
                 </div>
                 <h2 className="font-display text-4xl font-black text-slate-800 dark:text-white uppercase tracking-tighter">Calculadora de Eficiência</h2>
-                <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Analise se vale a pena trocar seus mineradores com base no custo por TH/s</p>
+                <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Analise se vale a pena trocar seus mineradores com base no custo por PH/s</p>
             </div>
 
             {/* Profile Section */}
@@ -274,7 +274,7 @@ export const EfficiencyCalc: React.FC = () => {
                                     <div>
                                         <p className="text-[10px] font-black opacity-40 uppercase">Eficiência Real</p>
                                         <p className="text-4xl font-black text-emerald-400">{results.effPower.toFixed(2)}</p>
-                                        <p className="text-[10px] font-bold opacity-60">RLT por cada 1 TH/s de ganho</p>
+                                        <p className="text-[10px] font-bold opacity-60">RLT por cada 1 PH/s de ganho</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="text-[10px] font-black opacity-40 uppercase">Status</p>
@@ -287,7 +287,7 @@ export const EfficiencyCalc: React.FC = () => {
                                 <div className="space-y-4 pt-6 border-t border-white/10">
                                     <div className="flex justify-between items-center">
                                         <span className="text-xs font-bold opacity-60">Eficiência Bruta (Miner)</span>
-                                        <span className="text-sm font-black">{results.effMiner.toFixed(2)} RLT/TH</span>
+                                        <span className="text-sm font-black">{results.effMiner.toFixed(2)} RLT/PH</span>
                                     </div>
                                     <div className="p-4 bg-white/5 rounded-xl flex items-start gap-3">
                                         <Info size={16} className="text-blue-400 mt-0.5" />
