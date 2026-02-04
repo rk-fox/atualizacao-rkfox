@@ -38,13 +38,15 @@ export const WhalePlanner: React.FC = () => {
     const [userLink, setUserLink] = useState('');
     const [loading, setLoading] = useState(false);
     const [dbMiners, setDbMiners] = useState<DBItem[]>([]);
-    const [minerImpacts, setMinerImpacts] = useState<RoomMiner[]>([]);
     const [selectedWhale, setSelectedWhale] = useState<RoomMiner | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [simulationResult, setSimulationResult] = useState<{ impact: number; formatted: string } | null>(null);
     const [selectedNewMiner, setSelectedNewMiner] = useState<{ item: DBItem, level: string } | null>(null);
     const [userStats, setUserStats] = useState({ minersPower: 0, totalBonusPercent: 0, totalOrig: 0 });
+    const [slotsFilter, setSlotsFilter] = useState<'1' | '2' | 'both'>('both');
+    const [marketFilter, setMarketFilter] = useState<'sellable' | 'not_sellable' | 'both'>('both');
+    const [allMiners, setAllMiners] = useState<RoomMiner[]>([]);
 
     const proxy = "https://summer-night-03c0.rk-foxx-159.workers.dev/?";
 
@@ -55,6 +57,51 @@ export const WhalePlanner: React.FC = () => {
         if (absValue >= 1e6) return sign + (absValue / 1e6).toFixed(3).replace('.', ',') + ' PH/s';
         if (absValue >= 1e3) return sign + (absValue / 1e3).toFixed(3).replace('.', ',') + ' TH/s';
         return sign + absValue.toFixed(3).replace('.', ',') + ' GH/s';
+    };
+
+    // Helper to load external scripts
+    const loadScript = (src: string) => {
+        return new Promise((resolve, reject) => {
+            if (document.querySelector(`script[src="${src}"]`)) {
+                resolve(true);
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = () => resolve(true);
+            script.onerror = () => reject(new Error(`Failed to load script ${src}`));
+            document.body.appendChild(script);
+        });
+    };
+
+    // Load external miner data for sellable check
+    useEffect(() => {
+        const loadMinerData = async () => {
+            try {
+                const scripts = [
+                    'https://wminerrc.github.io/calculator/data/basic_miners.js',
+                    'https://wminerrc.github.io/calculator/data/merge_miners.js',
+                    'https://wminerrc.github.io/calculator/data/old/merge_miners.js',
+                ];
+                await Promise.all(scripts.map(loadScript));
+            } catch (e) {
+                console.error("Failed to load miner data scripts", e);
+            }
+        };
+        loadMinerData();
+    }, []);
+
+    const checkSellable = (minerId: string) => {
+        const win = window as any;
+        const datasets = [win.basic_miners, win.merge_miners, win.old_merge_miners];
+        for (const dataset of datasets) {
+            if (!dataset) continue;
+            const miner = dataset.find((m: any) => m.miner_id === minerId);
+            if (miner) {
+                return miner.is_can_be_sold_on_mp || false;
+            }
+        }
+        return false;
     };
 
     const loadDatabase = useCallback(async () => {
@@ -141,6 +188,7 @@ export const WhalePlanner: React.FC = () => {
                     setImpact: 0,
                     setBonus: 0,
                     type: m.type,
+                    sellable: checkSellable(m.miner_id),
                     room_level: rack?.placement?.room_level || 0,
                     rack_x: rack?.placement?.x || 0,
                     rack_y: rack?.placement?.y || 0,
@@ -149,55 +197,91 @@ export const WhalePlanner: React.FC = () => {
                 };
             });
 
-            // Set Adjustments (Ported logic)
-            const applySets = (miners: RoomMiner[]) => {
-                const applyAdj = (ids: string[], bFull: number, bPart: number, b3?: number) => {
-                    const matches = miners.filter(m => ids.includes(m.miner_id));
-                    let adj = 0;
-                    if (b3 !== undefined) {
-                        adj = matches.length === 4 ? bFull : (matches.length === 3 ? bPart : (matches.length === 2 ? b3 : 0));
-                    } else {
-                        adj = matches.length === ids.length ? bFull : (matches.length >= 2 ? bPart : 0);
-                    }
-                    matches.forEach(m => m.setBonus += adj);
+
+            // Set Adjustments (User Provided Logic)
+            const applySets = (minersList: RoomMiner[]) => {
+                const applyBonusAdjustment = (miners: RoomMiner[], targetIds: string[], fullSetBonus: number, partialSetBonus: number) => {
+                    const matchingMiners = miners.filter(miner => targetIds.includes(miner.miner_id));
+                    const bonusAdjustment = matchingMiners.length === 4 ? fullSetBonus : (matchingMiners.length >= 2 ? partialSetBonus : 0);
+                    matchingMiners.forEach(miner => miner.setBonus += bonusAdjustment);
                 };
 
-                const applyImpact = (ids: string[], iFull: number, iPart: number) => {
-                    const matches = miners.filter(m => ids.includes(m.miner_id));
-                    const adj = matches.length === ids.length ? iFull : (matches.length >= 2 ? iPart : 0);
-                    matches.forEach(m => m.setImpact += adj);
+                const applyBonus2Adjustment = (miners: RoomMiner[], targetIds: string[], fullSetBonus: number, partialSetBonus: number) => {
+                    const matchingMiners = miners.filter(miner => targetIds.includes(miner.miner_id));
+                    const bonusAdjustment = matchingMiners.length === 3 ? fullSetBonus : (matchingMiners.length === 2 ? partialSetBonus : 0);
+                    matchingMiners.forEach(miner => miner.setBonus += bonusAdjustment);
+                };
+
+                const applyBonus3Adjustment = (miners: RoomMiner[], targetIds: string[], fullSetBonus: number, p1: number, p2: number) => {
+                    const matchingMiners = miners.filter(miner => targetIds.includes(miner.miner_id));
+                    const bonusAdjustment = matchingMiners.length === 4 ? fullSetBonus : (matchingMiners.length === 3 ? p1 : (matchingMiners.length === 2 ? p2 : 0));
+                    matchingMiners.forEach(miner => miner.setBonus += bonusAdjustment);
+                };
+
+                const applyBonus4Adjustment = (
+                    miners: RoomMiner[],
+                    targetIds: string[],
+                    fullSetBonus: number,    // 8 items
+                    partialSetBonus3: number, // 6 items
+                    partialSetBonus2: number, // 4 items
+                    partialSetBonus1: number  // 2 items
+                ) => {
+                    const matchingMiners = miners.filter(miner => targetIds.includes(miner.miner_id));
+                    const count = matchingMiners.length;
+
+                    const bonusAdjustment =
+                        count === 8 ? fullSetBonus
+                            : count >= 6 ? partialSetBonus3
+                                : count >= 4 ? partialSetBonus2
+                                    : count >= 2 ? partialSetBonus1
+                                        : 0;
+
+                    matchingMiners.forEach(miner => miner.setBonus += bonusAdjustment);
+                };
+
+                const applyImpact3Adjustment = (miners: RoomMiner[], targetIds: string[], full: number, partial: number) => {
+                    const matchingMiners = miners.filter(miner => targetIds.includes(miner.miner_id));
+                    const adjustment = matchingMiners.length === 3 ? full : (matchingMiners.length >= 2 ? partial : 0);
+                    matchingMiners.forEach(miner => miner.setImpact += adjustment);
+                };
+
+                const applyImpact4Adjustment = (miners: RoomMiner[], targetIds: string[], full: number, partial: number) => {
+                    const matchingMiners = miners.filter(miner => targetIds.includes(miner.miner_id));
+                    const adjustment = matchingMiners.length === 4 ? full : (matchingMiners.length >= 2 ? partial : 0);
+                    matchingMiners.forEach(miner => miner.setImpact += adjustment);
                 };
 
                 // Imperial Set
-                applyAdj(["66e40f32e0dd3530da8bf7da", "674882691745a1e9ed4c3d56", "674882a81745a1e9ed4c3e66", "66e40f06e0dd3530da8bf564", "66e40f5de0dd3530da8bfa3a", "674882691745a1e9ed4c3d5e", "674882a81745a1e9ed4c3e6e"], 10, 5);
+                applyBonus2Adjustment(minersList, ["66e40f32e0dd3530da8bf7da", "674882691745a1e9ed4c3d56", "674882a81745a1e9ed4c3e66", "66e40f06e0dd3530da8bf564", "66e40f5de0dd3530da8bfa3a", "674882691745a1e9ed4c3d5e", "674882a81745a1e9ed4c3e6e"], 10, 5);
                 // Radio Set
-                applyAdj(["693bd5f1b13b27427ba8a5c2", "693bd7d2b13b27427ba8af47", "693bd585b13b27427ba89ee7", "693bd705b13b27427ba8ac8e"], 90, 60, 40);
-                // Designer Set
-                applyAdj(["684947c1ccf7adb5d76505a6", "68626997411d00ff277d7a18", "686269fb411d00ff277d7b8d", "68626a8e411d00ff277d81cc", "68494781ccf7adb5d765052d", "68626962411d00ff277d76e9", "686269cb411d00ff277d7a80", "68626a5c411d00ff277d815a"], 24, 8);
+                applyBonus3Adjustment(minersList, ["693bd5f1b13b27427ba8a5c2", "693bd7d2b13b27427ba8af47", "693bd585b13b27427ba89ee7", "693bd705b13b27427ba8ac8e"], 90, 60, 40);
+                // Designer Set (8 items: 24%, 4 items: 8%)
+                // Passing 0 for intermediate 6-item and 2-item tiers if not applicable, assuming 8->24 and 4->8.
+                applyBonus4Adjustment(minersList, ["684947c1ccf7adb5d76505a6", "68626997411d00ff277d7a18", "686269fb411d00ff277d7b8d", "68626a8e411d00ff277d81cc", "68494781ccf7adb5d765052d", "68626962411d00ff277d76e9", "686269cb411d00ff277d7a80", "68626a5c411d00ff277d815a"], 120, 75, 40, 15);
                 // Royal Set
-                applyAdj(["6909e357dbb4b86eca7f24fa", "6909e3d4dbb4b86eca7f286c", "6909e466dbb4b86eca7f2928", "6909e329dbb4b86eca7f2489", "6909e395dbb4b86eca7f273b", "6909e466dbb4b86eca7f2925"], 24, 8);
+                applyBonusAdjustment(minersList, ["6909e357dbb4b86eca7f24fa", "6909e3d4dbb4b86eca7f286c", "6909e466dbb4b86eca7f2928", "6909e329dbb4b86eca7f2489", "6909e395dbb4b86eca7f273b", "6909e466dbb4b86eca7f2925"], 45, 25);
+                // Set 1 (24/8)
+                applyBonusAdjustment(minersList, ["68244844fbb67c190eed4dd7", "6824489bfbb67c190eed5222", "682448fcfbb67c190eed530f", "6824481dfbb67c190eed4d7d", "68244872fbb67c190eed4e6f", "682448ccfbb67c190eed52bb"], 24, 8);
+                // Set 2 (20/10)
+                applyBonusAdjustment(minersList, ["67c08778b5e8c2c0f194631d", "67c0879cb5e8c2c0f194636b", "67c087bcb5e8c2c0f19463b9", "67c087e3b5e8c2c0f1946b75"], 20, 10);
+                // Set 3 (10/5)
+                applyBonusAdjustment(minersList, ["66f1c200e0dd3530daa2eadf", "66f1c1b9e0dd3530daa2e9df", "66f1c18fe0dd3530daa2e8dd", "66f1c1dee0dd3530daa2ea96"], 10, 5);
+                // Set 4 (7/2)
+                applyBonusAdjustment(minersList, ["6687cf817643815232d65da6", "6687cfd57643815232d65e39", "6687cf557643815232d65d5c", "6687cfae7643815232d65def"], 7, 2);
 
-                // Impact Sets
-                applyImpact(["67338357d9b2852bde4b077d", "67338298d9b2852bde4afb0d", "67338415d9b2852bde4b0dc6"], 15000000, 7500000);
-                applyImpact(["66c31b17b82bcb27662d302b", "66c31aecb82bcb27662d2f53", "66c31b3eb82bcb27662d30d8"], 10000000, 5000000);
-                applyImpact(["66ead1cde0dd3530da969ea9", "66ead191e0dd3530da969e5f", "66ead1fbe0dd3530da969ef3"], 8000000, 5000000);
-                applyImpact(["6687cea87643815232d65882", "6687cefd7643815232d65d11", "6687ce4e7643815232d65297", "6687ced67643815232d65cc8"], 3000000, 2000000);
-                applyImpact(["6687cd307643815232d64077", "6687cdc47643815232d64726", "6687ccfc7643815232d6402d", "6687cd837643815232d640c1"], 2500000, 1500000);
+                // Impact Adjustments
+                applyImpact3Adjustment(minersList, ["67338357d9b2852bde4b077d", "67338298d9b2852bde4afb0d", "67338415d9b2852bde4b0dc6"], 15000000, 7500000);
+                applyImpact3Adjustment(minersList, ["66c31b17b82bcb27662d302b", "66c31aecb82bcb27662d2f53", "66c31b3eb82bcb27662d30d8"], 10000000, 5000000);
+                applyImpact3Adjustment(minersList, ["66ead1cde0dd3530da969ea9", "66ead191e0dd3530da969e5f", "66ead1fbe0dd3530da969ef3"], 8000000, 5000000);
+                applyImpact4Adjustment(minersList, ["6687cea87643815232d65882", "6687cefd7643815232d65d11", "6687ce4e7643815232d65297", "6687ced67643815232d65cc8"], 3000000, 2000000);
+                applyImpact4Adjustment(minersList, ["6687cd307643815232d64077", "6687cdc47643815232d64726", "6687ccfc7643815232d6402d", "6687cd837643815232d640c1"], 2500000, 1500000);
+                applyImpact4Adjustment(minersList, ["674df56acbe1e47b27075ab6", "674df5c5cbe1e47b27075b51", "674df539cbe1e47b27075a68", "674df599cbe1e47b27075b04"], 25000000, 10000000);
             };
 
             applySets(processedMiners);
 
             setUserStats({ minersPower, totalBonusPercent, totalOrig });
-
-            const finalImpacts = processedMiners.map(m => {
-                const remainingPower = minersPower - m.power;
-                const remainingBonus = totalBonusPercent - m.bonus_percent;
-                const newAdjusted = remainingPower * ((100 + remainingBonus - m.setBonus) / 100);
-                const impact = (newAdjusted - totalOrig) - m.setImpact;
-                return { ...m, impact, formattedImpact: convertPower(impact) };
-            }).sort((a, b) => b.impact - a.impact);
-
-            setMinerImpacts(finalImpacts.slice(0, 10));
+            setAllMiners(processedMiners);
 
         } catch (e) {
             console.error(e);
@@ -206,6 +290,34 @@ export const WhalePlanner: React.FC = () => {
             setLoading(false);
         }
     };
+
+    const minerImpacts = React.useMemo(() => {
+        if (allMiners.length === 0) return [];
+
+        let filtered = [...allMiners];
+        if (slotsFilter !== 'both') {
+            filtered = filtered.filter(m => m.width === parseInt(slotsFilter));
+        }
+        if (marketFilter === 'sellable') {
+            filtered = filtered.filter(m => m.sellable === true);
+        } else if (marketFilter === 'not_sellable') {
+            filtered = filtered.filter(m => m.sellable === false);
+        }
+
+        const { minersPower, totalBonusPercent, totalOrig } = userStats;
+
+        return filtered.map(m => {
+            const remainingPower = minersPower - m.power;
+            const remainingBonus = totalBonusPercent - m.bonus_percent;
+            const newAdjusted = remainingPower * ((100 + remainingBonus - m.setBonus) / 100);
+            const impact = (newAdjusted - totalOrig) - m.setImpact;
+            return {
+                ...m,
+                impact,
+                formattedImpact: convertPower(impact)
+            };
+        }).sort((a, b) => b.impact - a.impact).slice(0, 10);
+    }, [allMiners, slotsFilter, marketFilter, userStats]);
 
     const getLevelInfo = (level: number, type: string) => {
         const levels = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary', 'Unreal', 'Legacy'];
@@ -237,7 +349,7 @@ export const WhalePlanner: React.FC = () => {
 
         // Formula from impact.js:
         // let newImpact = (((somaminer - podervelho + powerValue) * (1 + ((somabonus - bonusvelho*100 + bonusValue)/100))) - ((somaminer * (1 + (somabonus/100)))));
-        const newImpact = (((minersPower - podervelho + powerValue) * (1 + ((totalBonusPercent - (bonusvelho * 100) + bonusValue) / 100))) - totalOrig);
+        const newImpact = (((minersPower - podervelho + powerValue) * (1 + ((totalBonusPercent - bonusvelho + bonusValue) / 100))) - totalOrig);
 
         setSimulationResult({
             impact: newImpact,
@@ -253,32 +365,88 @@ export const WhalePlanner: React.FC = () => {
     return (
         <div className="space-y-8 animate-fade-in max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
-                <div className="inline-flex p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl mb-4">
-                    <Trophy size={32} />
-                </div>
-                <h2 className="font-display text-4xl font-black text-slate-800 dark:text-white uppercase tracking-tighter">Whale Planner Pro</h2>
+                <h2 className="font-display text-4xl font-black text-slate-800 dark:text-white uppercase tracking-tighter">Planejador de Baleias</h2>
                 <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Identifique os mineradores de menor impacto e planeje substituições estratégicas</p>
             </div>
 
-            {/* Search Bar */}
-            <div className="bg-white dark:bg-dark-800 p-2 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row gap-2">
-                <div className="flex-grow flex items-center px-4 gap-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-transparent focus-within:border-blue-500 transition-all">
-                    <Search size={18} className="text-slate-400" />
-                    <input
-                        value={userLink}
-                        onChange={(e) => setUserLink(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        className="w-full py-4 bg-transparent outline-none text-slate-900 dark:text-white font-bold"
-                        placeholder="Digite o ID do perfil ou nome do jogador..."
-                    />
+            {/* Filters and Search Bar Container */}
+            <div className="bg-white dark:bg-dark-800 p-6 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 flex flex-col gap-6">
+                {/* Filters Row */}
+                <div className="flex flex-wrap gap-8 items-center px-4">
+                    {/* Slots Filter */}
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Slots</label>
+                        <div className="flex gap-4">
+                            {[
+                                { id: '1', label: '1 slot' },
+                                { id: '2', label: '2 slots' },
+                                { id: 'both', label: 'Ambos' }
+                            ].map((opt) => (
+                                <label key={opt.id} className="flex items-center gap-2 cursor-pointer group">
+                                    <div className="relative flex items-center justify-center">
+                                        <input
+                                            type="radio"
+                                            name="slots"
+                                            checked={slotsFilter === opt.id}
+                                            onChange={() => setSlotsFilter(opt.id as any)}
+                                            className="sr-only"
+                                        />
+                                        <div className={`w-4 h-4 rounded-full border-2 transition-all ${slotsFilter === opt.id ? 'border-blue-500 bg-blue-500' : 'border-slate-300 dark:border-slate-600'}`} />
+                                        {slotsFilter === opt.id && <div className="absolute w-1.5 h-1.5 bg-white rounded-full" />}
+                                    </div>
+                                    <span className={`text-[11px] font-bold transition-colors ${slotsFilter === opt.id ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>{opt.label}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Market Filter */}
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mercado</label>
+                        <div className="flex gap-4">
+                            {[
+                                { id: 'sellable', label: 'Negociável' },
+                                { id: 'not_sellable', label: 'Inegociável' },
+                                { id: 'both', label: 'Ambos' }
+                            ].map((opt) => (
+                                <label key={opt.id} className="flex items-center gap-2 cursor-pointer group">
+                                    <div className="relative flex items-center justify-center">
+                                        <input
+                                            type="radio"
+                                            name="market"
+                                            checked={marketFilter === opt.id}
+                                            onChange={() => setMarketFilter(opt.id as any)}
+                                            className="sr-only"
+                                        />
+                                        <div className={`w-4 h-4 rounded-full border-2 transition-all ${marketFilter === opt.id ? 'border-blue-500 bg-blue-500' : 'border-slate-300 dark:border-slate-600'}`} />
+                                        {marketFilter === opt.id && <div className="absolute w-1.5 h-1.5 bg-white rounded-full" />}
+                                    </div>
+                                    <span className={`text-[11px] font-bold transition-colors ${marketFilter === opt.id ? 'text-slate-900 dark:text-white' : 'text-slate-500'}`}>{opt.label}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-                <button
-                    onClick={handleSearch}
-                    disabled={loading}
-                    className="px-8 py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-500/20"
-                >
-                    {loading ? 'ANALISANDO...' : 'BUSCAR WHALE'}
-                </button>
+
+                <div className="flex flex-col md:flex-row gap-2">
+                    <div className="flex-grow flex items-center px-4 gap-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-transparent focus-within:border-blue-500 transition-all">
+                        <Search size={18} className="text-slate-400" />
+                        <input
+                            value={userLink}
+                            onChange={(e) => setUserLink(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                            className="w-full py-4 bg-transparent outline-none text-slate-900 dark:text-white font-bold"
+                            placeholder="Digite o Link da Sala (após /p/)"
+                        />
+                    </div>
+                    <button
+                        onClick={handleSearch}
+                        disabled={loading}
+                        className="px-8 py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-500/20"
+                    >
+                        {loading ? 'ANALISANDO...' : 'BUSCAR'}
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -290,7 +458,7 @@ export const WhalePlanner: React.FC = () => {
                                 <TrendingDown size={14} className="text-red-500" /> Top 10 Menor Impacto
                             </h3>
                         </div>
-                        <div className="divide-y divide-slate-50 dark:divide-slate-800">
+                        <div className="space-y-6">
                             {minerImpacts.map((m, idx) => {
                                 const levelInfo = getLevelInfo(m.level, m.type);
                                 return (
@@ -301,51 +469,59 @@ export const WhalePlanner: React.FC = () => {
                                             setSimulationResult(null);
                                             setSelectedNewMiner(null);
                                         }}
-                                        className={`p-6 cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-700/30 ${selectedWhale?.miner_id === m.miner_id ? 'bg-blue-50/50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''}`}
+                                        className={`p-6 cursor-pointer transition-all bg-slate-50 dark:bg-slate-900/30 rounded-[2rem] border shadow-sm hover:shadow-md ${selectedWhale?.miner_id === m.miner_id ? 'border-blue-500 ring-4 ring-blue-500/10' : 'border-slate-100 dark:border-slate-800'}`}
                                     >
                                         <div className="flex flex-col md:flex-row gap-6">
-                                            {/* Rank and Image */}
-                                            <div className="flex flex-col items-center gap-2 w-full md:w-32 bg-slate-900/40 p-4 rounded-xl border border-slate-700">
-                                                <span className="text-[10px] font-black uppercase text-slate-500">{idx + 1}º Lugar</span>
-                                                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-900 rounded-lg flex-shrink-0 overflow-hidden border border-slate-200 dark:border-slate-800">
+                                            {/* Rank and Image Container */}
+                                            <div className="flex flex-col items-center gap-2 w-full md:w-40 bg-white/50 dark:bg-slate-900/40 p-5 rounded-[1.5rem] border border-slate-100 dark:border-slate-700/50">
+                                                <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{idx + 1}º Lugar</span>
+                                                <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl flex-shrink-0 p-2 shadow-inner border border-slate-100 dark:border-slate-700">
                                                     <img src={`https://static.rollercoin.com/static/img/market/miners/${m.filename}.gif?v=1`} alt="" className="w-full h-full object-contain" />
                                                 </div>
-                                                <div className="text-center">
-                                                    <span className={`text-[10px] font-black uppercase tracking-tighter ${levelInfo.color}`}>{levelInfo.text}</span>
-                                                    <div className="font-black text-[11px] dark:text-white uppercase leading-tight mt-1">{m.name}</div>
-                                                    <div className="text-[9px] font-bold text-red-500 mt-1 uppercase">Inegociável</div>
+                                                <div className="text-center mt-2">
+                                                    <span className={`text-[9px] font-black uppercase tracking-widest ${levelInfo.color}`}>{levelInfo.text}</span>
+                                                    <div className="font-black text-xs dark:text-white uppercase leading-tight mt-1 tracking-tight">{m.name}</div>
+                                                    <div className={`text-[9px] font-black mt-2 uppercase px-2 py-0.5 rounded-full border ${m.sellable ? 'text-blue-500 border-blue-500/20 bg-blue-500/5' : 'text-red-500 border-red-500/20 bg-red-500/5'}`}>
+                                                        {m.sellable ? 'Negociável' : 'Inegociável'}
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            {/* Data Table */}
-                                            <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-2">
-                                                <div className="bg-slate-900/20 p-2 rounded-lg border border-white/5">
-                                                    <p className="text-[8px] font-black text-slate-500 uppercase">Poder</p>
-                                                    <p className="text-xs font-bold dark:text-white">{convertPower(m.power)}</p>
+                                            {/* Stats Grid */}
+                                            <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-3">
+                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
+                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Poder</p>
+                                                    <p className="text-sm font-bold dark:text-white">{convertPower(m.power)}</p>
                                                 </div>
-                                                <div className="bg-slate-900/20 p-2 rounded-lg border border-white/5">
-                                                    <p className="text-[8px] font-black text-slate-500 uppercase">Bônus</p>
-                                                    <p className="text-xs font-bold text-blue-400">{(m.bonus_percent * 100).toFixed(2)}%</p>
+                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
+                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Bônus</p>
+                                                    <p className="text-sm font-bold text-blue-500">{m.bonus_percent.toFixed(2)}%</p>
                                                 </div>
-                                                <div className="bg-slate-900/20 p-2 rounded-lg border border-white/5">
-                                                    <p className="text-[8px] font-black text-slate-500 uppercase">Impacto Total</p>
-                                                    <p className="text-xs font-bold text-red-500">{m.formattedImpact}</p>
+                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
+                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Impacto Total</p>
+                                                    <p className="text-sm font-bold text-red-500">-{convertPower(Math.abs(m.impact))}</p>
                                                 </div>
-                                                <div className="bg-slate-900/20 p-2 rounded-lg border border-white/5">
-                                                    <p className="text-[8px] font-black text-slate-500 uppercase">Localização</p>
-                                                    <p className="text-[9px] font-bold dark:text-slate-300">S: {m.room_level + 1}, L: {m.rack_y + 1}, R: {m.rack_x + 1}</p>
+                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
+                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                                                        Localização
+                                                    </p>
+                                                    <p className="text-[11px] font-black dark:text-slate-300">
+                                                        Sala: {m.room_level + 1} <br />
+                                                        Linha: {m.rack_y + 1} <br />
+                                                        Rack: {m.rack_x + 1}
+                                                    </p>
                                                 </div>
-                                                <div className="bg-slate-900/20 p-2 rounded-lg border border-white/5">
-                                                    <p className="text-[8px] font-black text-slate-500 uppercase">Faz parte de Set?</p>
-                                                    <p className="text-[10px] font-bold dark:text-white">{m.setBonus > 0 || m.is_in_set ? 'Sim' : 'Não'}</p>
+                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
+                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Faz parte de Set?</p>
+                                                    <p className="text-xs font-black dark:text-white">{m.setBonus > 0 || m.is_in_set ? 'Sim' : 'Não'}</p>
                                                 </div>
-                                                <div className="bg-slate-900/20 p-2 rounded-lg border border-white/5">
-                                                    <p className="text-[8px] font-black text-slate-500 uppercase">Repetida/Merge</p>
-                                                    <p className="text-[10px] font-bold dark:text-white">{m.repetitions}</p>
+                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
+                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Repetida/Merge</p>
+                                                    <p className="text-xs font-black dark:text-white">{m.repetitions}</p>
                                                 </div>
-                                                <div className="bg-slate-900/20 p-2 rounded-lg border border-white/5 col-span-2">
-                                                    <p className="text-[8px] font-black text-slate-500 uppercase">Bônus de Set</p>
-                                                    <p className="text-[10px] font-bold text-emerald-500">{m.setBonus > 0 ? `+${m.setBonus}%` : (m.setImpact > 0 ? convertPower(m.setImpact) : '0%')}</p>
+                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5 col-span-2">
+                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Bônus de Set</p>
+                                                    <p className="text-sm font-bold text-emerald-500">{m.setBonus > 0 ? `+${m.setBonus}%` : (m.setImpact > 0 ? `+${convertPower(m.setImpact)}` : '0%')}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -407,7 +583,7 @@ export const WhalePlanner: React.FC = () => {
                                         <div className="bg-white dark:bg-dark-800 p-2 rounded-xl text-center border border-slate-200 dark:border-slate-700">
                                             <p className="text-[8px] font-bold text-slate-400 uppercase">Impacto Final</p>
                                             <p className={`text-xs font-black ${simulationResult?.impact && simulationResult.impact < 0 ? 'text-red-500' : 'text-emerald-500'}`}>
-                                                {simulationResult?.formatted || '0 PH/s'}
+                                                {simulationResult?.formatted || '0,000 PH/s'}
                                             </p>
                                         </div>
                                     </div>
