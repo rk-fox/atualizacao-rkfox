@@ -56,7 +56,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                     <div className="text-center">
                         <Link to="/" className="group relative">
-                            <img className="h-[250px]" src="./banner.png" alt="RK FOX Banner" />
+                            <img className="h-[250px] rounded-xl" src="https://rk-fox.github.io/images/banner.png" alt="RK FOX Banner" />
                         </Link>
                         {!isHome && (
                             <Link to="/" className="inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-blue-500 transition-colors mt-1">

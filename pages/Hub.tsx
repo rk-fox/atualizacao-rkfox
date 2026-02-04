@@ -33,13 +33,13 @@ export const Hub: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <a href="https://www.youtube.com/@RKFox" target="_blank" className="flex items-center gap-4 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 group">
                         <div className="p-2 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
-                            <Youtube size={24} fill="white" />
+                            <Youtube size={24} fill="red" strokeWidth={1.5} />
                         </div>
                         <span className="font-bold text-lg">YouTube</span>
                     </a>
                     <a href="https://t.me/+alVozn_qNRAxZmNh" target="_blank" className="flex items-center gap-4 bg-sky-500 hover:bg-sky-600 text-white p-4 rounded-xl shadow-sm transition-all hover:-translate-y-0.5 group">
                         <div className="p-2 bg-white/20 rounded-full group-hover:scale-110 transition-transform">
-                            <Send size={24} fill="white" />
+                            <Send size={24} fill="blue" strokeWidth={1.5} />
                         </div>
                         <span className="font-bold text-lg">Telegram</span>
                     </a>

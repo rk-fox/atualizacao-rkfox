@@ -107,9 +107,6 @@ export const EfficiencyCalc: React.FC = () => {
     return (
         <div className="space-y-8 animate-fade-in max-w-6xl mx-auto px-4 pb-20">
             <div className="text-center mb-12">
-                <div className="inline-flex p-3 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-2xl mb-4">
-                    <TrendingUp size={32} />
-                </div>
                 <h2 className="font-display text-4xl font-black text-slate-800 dark:text-white uppercase tracking-tighter">Calculadora de Eficiência</h2>
                 <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Analise se vale a pena trocar seus mineradores com base no custo por PH/s</p>
             </div>
@@ -176,7 +173,7 @@ export const EfficiencyCalc: React.FC = () => {
                                 </p>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-[8px] font-black uppercase text-slate-400 mb-1">Poder (TH/s)</label>
+                                        <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Poder (TH/s)</label>
                                         <input
                                             type="number"
                                             value={inputs.sellPower}
@@ -185,7 +182,7 @@ export const EfficiencyCalc: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[8px] font-black uppercase text-slate-400 mb-1">Bônus (%)</label>
+                                        <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Bônus (%)</label>
                                         <input
                                             type="number"
                                             value={inputs.sellBonus}
@@ -203,7 +200,7 @@ export const EfficiencyCalc: React.FC = () => {
                                 </p>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-[8px] font-black uppercase text-slate-400 mb-1">Poder (TH/s)</label>
+                                        <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Poder (TH/s)</label>
                                         <input
                                             type="number"
                                             value={inputs.buyPower}
@@ -212,7 +209,7 @@ export const EfficiencyCalc: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-[8px] font-black uppercase text-slate-400 mb-1">Bônus (%)</label>
+                                        <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Bônus (%)</label>
                                         <input
                                             type="number"
                                             value={inputs.buyBonus}
