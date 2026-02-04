@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Calculator, User, Award, Wallet, TrendingUp, Info, RefreshCw } from 'lucide-react';
+import { Calculator, User, Award, Wallet, TrendingUp, Info, RefreshCw, Zap } from 'lucide-react';
 
 interface CryptoPrice {
     usd: number;
@@ -25,6 +25,8 @@ export const FarmCalc: React.FC = () => {
     const [profileLink, setProfileLink] = useState('');
     const [profileData, setProfileData] = useState<any>(null);
     const [farmRows, setFarmRows] = useState<FarmRow[]>([]);
+
+    const [userPower, setUserPower] = useState<number>(0);
 
     const proxy = "https://summer-night-03c0.rk-foxx-159.workers.dev/?";
     const coinGeckoIds: any = { BTC: 'bitcoin', LTC: 'litecoin', BNB: 'binancecoin', POL: 'polygon-ecosystem-token', XRP: 'ripple', DOGE: 'dogecoin', ETH: 'ethereum', TRX: 'tron', SOL: 'solana', ALGO: 'algorand' };
@@ -71,7 +73,9 @@ export const FarmCalc: React.FC = () => {
             // 2. User Power
             const powerRes = await fetch(`${proxy}https://rollercoin.com/api/profile/user-power-data/${avatarId}`);
             const powerData = (await powerRes.json()).data;
-            const userPower = powerData.current_power;
+            const currentPower = powerData.current_power;
+            setUserPower(currentPower);
+            const userPowerVal = currentPower;
 
             // 3. Prices
             const ids = Object.values(coinGeckoIds).join(',');
@@ -114,7 +118,7 @@ export const FarmCalc: React.FC = () => {
                 const poderRede = results.total_power;
                 const minimo = minimos[token as string];
 
-                const fblk = (userPower / (poderRede + userPower)) * bloco;
+                const fblk = (userPowerVal / (poderRede + userPowerVal)) * bloco;
                 const fdia = tempoSec > 0 ? (86400 / tempoSec) * fblk : 0;
                 const fmes = fdia * 30;
 
@@ -158,9 +162,6 @@ export const FarmCalc: React.FC = () => {
     return (
         <div className="space-y-8 animate-fade-in max-w-7xl mx-auto px-4 pb-20">
             <div className="text-center mb-12">
-                <div className="inline-flex p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-2xl mb-4">
-                    <TrendingUp size={32} />
-                </div>
                 <h2 className="font-display text-4xl font-black text-slate-800 dark:text-white uppercase tracking-tighter">Calculadora de Farm</h2>
                 <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Estime seus rendimentos reais com base no seu poder e na rede RollerCoin</p>
             </div>
@@ -213,11 +214,11 @@ export const FarmCalc: React.FC = () => {
                         </div>
                         <div className="bg-white dark:bg-dark-800 p-6 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-700 flex items-center gap-4">
                             <div className="p-4 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 rounded-2xl">
-                                <Wallet size={24} />
+                                <Zap size={24} />
                             </div>
                             <div>
-                                <p className="text-[10px] text-slate-400 uppercase font-black">Status Global</p>
-                                <p className="font-display font-black text-xl dark:text-white uppercase leading-tight">#{profileData.rank?.toLocaleString() || '---'}</p>
+                                <p className="text-[10px] text-slate-400 uppercase font-black">Poder Total</p>
+                                <p className="font-display font-black text-xl dark:text-white uppercase leading-tight">{formatPower(userPower)}</p>
                             </div>
                         </div>
                     </div>

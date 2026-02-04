@@ -451,91 +451,88 @@ export const WhalePlanner: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* List Column */}
-                <div className="lg:col-span-2 space-y-4">
-                    <div className="bg-white dark:bg-dark-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
-                        <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
-                            <h3 className="text-xs font-black uppercase text-slate-500 flex items-center gap-2">
-                                <TrendingDown size={14} className="text-red-500" /> Top 10 Menor Impacto
-                            </h3>
-                        </div>
-                        <div className="space-y-6">
-                            {minerImpacts.map((m, idx) => {
-                                const levelInfo = getLevelInfo(m.level, m.type);
-                                return (
-                                    <div
-                                        key={idx}
-                                        onClick={() => {
-                                            setSelectedWhale(m);
-                                            setSimulationResult(null);
-                                            setSelectedNewMiner(null);
-                                        }}
-                                        className={`p-6 cursor-pointer transition-all bg-slate-50 dark:bg-slate-900/30 rounded-[2rem] border shadow-sm hover:shadow-md ${selectedWhale?.miner_id === m.miner_id ? 'border-blue-500 ring-4 ring-blue-500/10' : 'border-slate-100 dark:border-slate-800'}`}
-                                    >
-                                        <div className="flex flex-col md:flex-row gap-6">
-                                            {/* Rank and Image Container */}
-                                            <div className="flex flex-col items-center gap-2 w-full md:w-40 bg-white/50 dark:bg-slate-900/40 p-5 rounded-[1.5rem] border border-slate-100 dark:border-slate-700/50">
-                                                <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{idx + 1}º Lugar</span>
-                                                <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl flex-shrink-0 p-2 shadow-inner border border-slate-100 dark:border-slate-700">
-                                                    <img src={`https://static.rollercoin.com/static/img/market/miners/${m.filename}.gif?v=1`} alt="" className="w-full h-full object-contain" />
-                                                </div>
-                                                <div className="text-center mt-2">
-                                                    <span className={`text-[9px] font-black uppercase tracking-widest ${levelInfo.color}`}>{levelInfo.text}</span>
-                                                    <div className="font-black text-xs dark:text-white uppercase leading-tight mt-1 tracking-tight">{m.name}</div>
-                                                    <div className={`text-[9px] font-black mt-2 uppercase px-2 py-0.5 rounded-full border ${m.sellable ? 'text-blue-500 border-blue-500/20 bg-blue-500/5' : 'text-red-500 border-red-500/20 bg-red-500/5'}`}>
-                                                        {m.sellable ? 'Negociável' : 'Inegociável'}
-                                                    </div>
-                                                </div>
-                                            </div>
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="flex items-center gap-2 px-2">
+                        <TrendingDown size={20} className="text-red-500" />
+                        <h3 className="text-lg font-black uppercase text-slate-700 dark:text-white">Top 10 Menor Impacto</h3>
+                    </div>
 
-                                            {/* Stats Grid */}
-                                            <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-3">
-                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
-                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Poder</p>
-                                                    <p className="text-sm font-bold dark:text-white">{convertPower(m.power)}</p>
-                                                </div>
-                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
-                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Bônus</p>
-                                                    <p className="text-sm font-bold text-blue-500">{m.bonus_percent.toFixed(2)}%</p>
-                                                </div>
-                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
-                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Impacto Total</p>
-                                                    <p className="text-sm font-bold text-red-500">-{convertPower(Math.abs(m.impact))}</p>
-                                                </div>
-                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
-                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
-                                                        Localização
-                                                    </p>
-                                                    <p className="text-[11px] font-black dark:text-slate-300">
-                                                        Sala: {m.room_level + 1} <br />
-                                                        Linha: {m.rack_y + 1} <br />
-                                                        Rack: {m.rack_x + 1}
-                                                    </p>
-                                                </div>
-                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
-                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Faz parte de Set?</p>
-                                                    <p className="text-xs font-black dark:text-white">{m.setBonus > 0 || m.is_in_set ? 'Sim' : 'Não'}</p>
-                                                </div>
-                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5">
-                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Repetida/Merge</p>
-                                                    <p className="text-xs font-black dark:text-white">{m.repetitions}</p>
-                                                </div>
-                                                <div className="bg-white/50 dark:bg-slate-800/40 p-4 rounded-[1.25rem] border border-slate-100 dark:border-white/5 col-span-2">
-                                                    <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Bônus de Set</p>
-                                                    <p className="text-sm font-bold text-emerald-500">{m.setBonus > 0 ? `+${m.setBonus}%` : (m.setImpact > 0 ? `+${convertPower(m.setImpact)}` : '0%')}</p>
-                                                </div>
+                    {minerImpacts.map((m, idx) => {
+                        const levelInfo = getLevelInfo(m.level, m.type);
+                        return (
+                            <div
+                                key={idx}
+                                onClick={() => {
+                                    setSelectedWhale(m);
+                                    setSimulationResult(null);
+                                    setSelectedNewMiner(null);
+                                }}
+                                className={`p-6 cursor-pointer transition-all bg-white dark:bg-dark-800 rounded-[2.5rem] border shadow-lg hover:shadow-xl hover:-translate-y-1 ${selectedWhale?.miner_id === m.miner_id ? 'border-blue-500 ring-4 ring-blue-500/20' : 'border-slate-100 dark:border-slate-700'}`}
+                            >
+                                <div className="flex flex-col md:flex-row gap-6">
+                                    {/* Rank and Image Container */}
+                                    <div className="flex flex-col items-center gap-2 w-full md:w-40 bg-slate-50 dark:bg-slate-900/50 p-5 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{idx + 1}º Lugar</span>
+                                        <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-2xl flex-shrink-0 p-2 shadow-inner border border-slate-100 dark:border-slate-700">
+                                            <img src={`https://static.rollercoin.com/static/img/market/miners/${m.filename}.gif?v=1`} alt="" className="w-full h-full object-contain" />
+                                        </div>
+                                        <div className="text-center mt-2">
+                                            <span className={`text-[9px] font-black uppercase tracking-widest ${levelInfo.color}`}>{levelInfo.text}</span>
+                                            <div className="font-black text-xs dark:text-white uppercase leading-tight mt-1 tracking-tight">{m.name}</div>
+                                            <div className={`text-[9px] font-black mt-2 uppercase px-2 py-0.5 rounded-full border ${m.sellable ? 'text-blue-500 border-blue-500/20 bg-blue-500/5' : 'text-red-500 border-red-500/20 bg-red-500/5'}`}>
+                                                {m.sellable ? 'Negociável' : 'Inegociável'}
                                             </div>
                                         </div>
                                     </div>
-                                );
-                            })}
-                            {minerImpacts.length === 0 && !loading && (
-                                <div className="py-20 text-center text-slate-300 dark:text-slate-600">
-                                    <Search size={48} strokeWidth={1} className="mx-auto mb-4 opacity-20" />
-                                    <p className="text-xs font-black uppercase tracking-widest">Busque um jogador para ver os impactos</p>
+
+                                    {/* Stats Grid */}
+                                    <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800">
+                                            <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Poder</p>
+                                            <p className="text-sm font-bold dark:text-white">{convertPower(m.power)}</p>
+                                        </div>
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800">
+                                            <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Bônus</p>
+                                            <p className="text-sm font-bold text-blue-500">{m.bonus_percent.toFixed(2)}%</p>
+                                        </div>
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800">
+                                            <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Impacto Total</p>
+                                            <p className="text-sm font-bold text-red-500">-{convertPower(Math.abs(m.impact))}</p>
+                                        </div>
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800">
+                                            <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                                                Localização
+                                            </p>
+                                            <p className="text-[11px] font-black dark:text-slate-300">
+                                                Sala: {m.room_level + 1} <br />
+                                                Linha: {m.rack_y + 1} <br />
+                                                Rack: {m.rack_x + 1}
+                                            </p>
+                                        </div>
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800">
+                                            <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Faz parte de Set?</p>
+                                            <p className="text-xs font-black dark:text-white">{m.setBonus > 0 || m.is_in_set ? 'Sim' : 'Não'}</p>
+                                        </div>
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800">
+                                            <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Repetida/Merge</p>
+                                            <p className="text-xs font-black dark:text-white">{m.repetitions}</p>
+                                        </div>
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-800 col-span-2">
+                                            <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Bônus de Set</p>
+                                            <p className="text-sm font-bold text-emerald-500">{m.setBonus > 0 ? `+${m.setBonus}%` : (m.setImpact > 0 ? `+${convertPower(m.setImpact)}` : '0%')}</p>
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
+                            </div>
+                        );
+                    })}
+
+                    {minerImpacts.length === 0 && !loading && (
+                        <div className="bg-white dark:bg-dark-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 py-20 text-center text-slate-300 dark:text-slate-600 shadow-sm">
+                            <Search size={48} strokeWidth={1} className="mx-auto mb-4 opacity-20" />
+                            <p className="text-xs font-black uppercase tracking-widest">Busque um jogador para ver os impactos</p>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Simulation Column */}

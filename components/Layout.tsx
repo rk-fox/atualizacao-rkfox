@@ -36,7 +36,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                 {/* Top Banner - Unified Size */}
                 <Banner
-                    href="https://rollercoin.com/en?r=130955"
+                    href="https://rollercoin.com/?r=kyluudij"
                     src="https://static.rollercoin.com/static/img/ref/gen2/w320h50.png"
                     alt="Top Advertisement"
                     className="mb-6"
@@ -77,7 +77,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <div className="max-w-4xl mx-auto flex flex-col items-center text-center space-y-8">
                     {/* Footer Banner */}
                     <Banner
-                        href="https://rollercoin.com/en?r=130955"
+                        href="https://rollercoin.com/?r=kyluudij"
                         src="https://static.rollercoin.com/static/img/ref/gen2/w320h50.png"
                         alt="Footer Advertisement"
                     />

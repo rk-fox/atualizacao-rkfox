@@ -105,26 +105,26 @@ export const Hub: React.FC = () => {
 
                 {/* Sub Menu Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <button className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
+                    <Link to="https://rk-fox.github.io/ranking/" target="_blank" rel="noreferrer" className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
                         <Trophy size={20} className="text-blue-600 group-hover:scale-110 transition-transform" />
                         <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">Ranking</span>
-                    </button>
+                    </Link>
                     <Link to="/farm" className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
                         <Calculator size={20} className="text-blue-600 group-hover:scale-110 transition-transform" />
                         <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">Calc Farm</span>
                     </Link>
-                    <Link to="/event" className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
+                    <Link to="https://minaryganar.com/current-event/" target="_blank" rel="noreferrer" className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
                         <Gift size={20} className="text-blue-600 group-hover:scale-110 transition-transform" />
                         <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">Recompensas</span>
                     </Link>
-                    <button className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
+                    <Link to="https://minaryganar.com/miner/cathouse-miner/" target="_blank" rel="noreferrer" className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
                         <Combine size={20} className="text-blue-600 group-hover:scale-110 transition-transform" />
                         <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">Fusões</span>
-                    </button>
-                    <a href="https://rollercoin.com" target="_blank" rel="noreferrer" className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
+                    </Link>
+                    <Link to="https://rollercoin.com/?r=kyluudij" target="_blank" rel="noreferrer" className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
                         <Gamepad2 size={20} className="text-blue-600 group-hover:scale-110 transition-transform" />
                         <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">RollerCoin</span>
-                    </a>
+                    </Link>
                 </div>
             </div>
 
@@ -137,22 +137,29 @@ export const Hub: React.FC = () => {
                         <CreditCard className="text-blue-500" size={20} /> Task Timewall
                     </h3>
                     <div className="space-y-3">
-                        <div className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between group hover:border-red-500 transition-colors cursor-pointer">
-                            <div className="flex items-center gap-3">
-                                <Youtube size={20} className="text-red-600" />
-                                <span className="font-bold text-sm text-slate-700 dark:text-white">Vídeo Tutorial</span>
+                        <Link to="https://youtu.be/TpdYh4UKzhE" target="_blank" rel="noreferrer">
+                            <div className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between group hover:border-red-500 transition-colors cursor-pointer">
+                                <div className="flex items-center gap-3">
+                                    <Youtube size={20} className="text-red-600" />
+                                    <span className="font-bold text-sm text-slate-700 dark:text-white">Vídeo Tutorial</span>
+                                </div>
+                                <ExternalLink size={16} className="text-slate-400 group-hover:text-red-500" />
                             </div>
-                            <ExternalLink size={16} className="text-slate-400 group-hover:text-red-500" />
-                        </div>
-                        <div className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between group hover:border-green-500 transition-colors cursor-pointer">
-                            <div className="flex items-center gap-3">
-                                <CreditCard size={20} className="text-green-600" />
-                                <span className="font-bold text-sm text-slate-700 dark:text-white">Cartão Grátis + R$20 Bônus</span>
+                        </Link>
+                    </div>
+                    <div className="space-y-3">
+                        <Link to="https://mpago.li/2u71oNR" target="_blank" rel="noreferrer">
+                            <div className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between group hover:border-green-500 transition-colors cursor-pointer">
+                                <div className="flex items-center gap-3">
+                                    <CreditCard size={20} className="text-green-600" />
+                                    <span className="font-bold text-sm text-slate-700 dark:text-white">Cartão Grátis + R$20 Bônus</span>
+                                </div>
+                                <Gift size={16} className="text-slate-400 group-hover:text-green-500" />
                             </div>
-                            <Gift size={16} className="text-slate-400 group-hover:text-green-500" />
-                        </div>
+                        </Link>
                     </div>
                 </div>
+
 
                 {/* Cripto & Exchanges */}
                 <div className="space-y-4">
@@ -160,18 +167,18 @@ export const Hub: React.FC = () => {
                         <Bitcoin className="text-blue-500" size={20} /> Cripto & Exchanges
                     </h3>
                     <div className="space-y-3">
-                        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-between transition-colors shadow-sm">
+                        <a href="https://sideshift.ai/a/RKFox" target="_blank" rel="noreferrer" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-between transition-colors shadow-sm">
                             <span>SideShift</span>
                             <ArrowLeftRight size={18} />
-                        </button>
-                        <button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-between transition-colors shadow-sm">
+                        </a>
+                        <a href="https://ff.io/?ref=rkfox" target="_blank" rel="noreferrer" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-between transition-colors shadow-sm">
                             <span>Fixed Float</span>
                             <Zap size={18} fill="currentColor" />
-                        </button>
-                        <button className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 px-4 rounded-xl flex flex-col items-center justify-center transition-colors shadow-sm border border-slate-700">
+                        </a>
+                        <a href="https://quantfury.com/portuge/" target="_blank" rel="noreferrer" className="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 px-4 rounded-xl flex flex-col items-center justify-center transition-colors shadow-sm border border-slate-700">
                             <span className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Quantfury Ref</span>
                             <span className="text-yellow-500 text-lg tracking-wider">FN8G3J54</span>
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -183,11 +190,11 @@ export const Hub: React.FC = () => {
                     <h3 className="font-display font-black text-2xl md:text-3xl mb-2">Precisa de arte, mídia ou música?</h3>
                     <p className="text-blue-100 font-medium">Serviços profissionais para criadores e marcas.</p>
                 </div>
-                <button className="bg-white text-blue-600 font-bold py-3 px-6 rounded-lg hover:bg-blue-50 transition-colors shadow-sm whitespace-nowrap">
+                <a href="https://linktr.ee/GUERDEART" target="_blank" rel="noreferrer" className="bg-white text-blue-600 font-bold py-3 px-6 rounded-lg hover:bg-blue-50 transition-colors shadow-sm whitespace-nowrap">
                     Portfólio e Contato GUERDE
-                </button>
+                </a>
             </div>
 
-        </div>
+        </div >
     );
 };
