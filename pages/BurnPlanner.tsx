@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link2, LayoutList, RefreshCcw, Calculator, Flame, Info, ChevronDown, ChevronUp, CheckSquare, Square, Search } from 'lucide-react';
 
 interface ParsedMiner {
@@ -174,6 +174,23 @@ const CollapsibleTable = ({
 };
 
 export const BurnPlanner: React.FC = () => {
+    const hasRun = useRef(false);
+
+    useEffect(() => {
+        if (hasRun.current) return;
+        hasRun.current = true;
+
+        const script_google = 'https://script.google.com/macros/s/AKfycbyS5c2Nr70VpAzYyM4cpGZtbm5wMWuX_AnhOJSHGg7ulIqs_1IH3opajMZoaQSlIBGP/exec';
+
+        const updateCounterF2 = () => {
+            fetch(script_google, {
+                method: 'POST',
+                mode: 'no-cors'
+            }).catch(e => console.error("Error updating counter:", e));
+        };
+
+        updateCounterF2();
+    }, []);
     const [userLink, setUserLink] = useState('');
     const [inventoryData, setInventoryData] = useState('');
     const [ptsTHs, setPtsTHs] = useState<number>(100);

@@ -1,7 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Calculator, Search, TrendingUp, TrendingDown, Info, DollarSign, Zap } from 'lucide-react';
 
 export const EfficiencyCalc: React.FC = () => {
+    const hasRun = useRef(false);
+
+    useEffect(() => {
+        if (hasRun.current) return;
+        hasRun.current = true;
+
+        const script_google = 'https://script.google.com/macros/s/AKfycbzczni1hzu4ZbwOgeOF6OxRDECu05uimOEbsrobN0LKw711L8TuX2q7PhXKpzgDmgRn/exec';
+
+        const updateCounterC2 = () => {
+            fetch(script_google, {
+                method: 'POST',
+                mode: 'no-cors'
+            }).catch(e => console.error("Error updating counter:", e));
+        };
+
+        updateCounterC2();
+    }, []);
+
     const [userLink, setUserLink] = useState('');
     const [loading, setLoading] = useState(false);
 

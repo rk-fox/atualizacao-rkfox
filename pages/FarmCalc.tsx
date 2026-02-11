@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Calculator, User, Award, Wallet, TrendingUp, Info, RefreshCw, Zap } from 'lucide-react';
 
 interface CryptoPrice {
@@ -21,6 +21,24 @@ interface FarmRow {
 }
 
 export const FarmCalc: React.FC = () => {
+    const hasRun = useRef(false);
+
+    useEffect(() => {
+        if (hasRun.current) return;
+        hasRun.current = true;
+
+        const script_google = 'https://script.google.com/macros/s/AKfycbxXE-hJGU4J2b76mButw9dQggLONaWXanf8yMB9Iy2yHyAJwLlGwoZOwwsIiRhNpFYQ/exec';
+
+        const updateCounterH2 = () => {
+            fetch(script_google, {
+                method: 'POST',
+                mode: 'no-cors'
+            }).catch(e => console.error("Error updating counter:", e));
+        };
+
+        updateCounterH2();
+    }, []);
+
     const [loading, setLoading] = useState(false);
     const [profileLink, setProfileLink] = useState('');
     const [profileData, setProfileData] = useState<any>(null);

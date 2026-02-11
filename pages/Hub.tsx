@@ -1,27 +1,53 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Calculator,
-    BarChart3,
+    Wallet,
+    TrendingUp,
+    Search,
+    ExternalLink,
+    Zap,
+    LayoutList,
+    Calendar,
+    Trophy,
+    ArrowRight,
+    ArrowLeftRight,
+    Paintbrush,
+    Music,
+    FileImage,
     Flame,
     Grid,
     Youtube,
     Send,
     CreditCard,
     Video,
-    ExternalLink,
     Wrench,
-    Trophy,
     Gift,
     Combine,
     Gamepad2,
-    Zap,
-    LayoutGrid,
-    ArrowLeftRight,
-    Bitcoin
+    Bitcoin,
+    LayoutGrid
 } from 'lucide-react';
 
 export const Hub: React.FC = () => {
+    const hasRun = useRef(false);
+
+    useEffect(() => {
+        if (hasRun.current) return;
+        hasRun.current = true;
+
+        const script_google = 'https://script.google.com/macros/s/AKfycbyiwGM4G3QVt0DQTPCKvpR0QglskRcnxCDmS_CfC4Ho-A5pUAvP5eAa0ehw27B-BMDM/exec';
+
+        const updateCounterA2 = () => {
+            fetch(script_google, {
+                method: 'POST',
+                mode: 'no-cors'
+            }).catch(e => console.error("Error updating counter:", e));
+        };
+
+        updateCounterA2();
+    }, []);
+
     return (
         <div className="space-y-10 font-sans">
 
@@ -105,7 +131,7 @@ export const Hub: React.FC = () => {
 
                 {/* Sub Menu Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <Link to="https://rk-fox.github.io/ranking/" target="_blank" rel="noreferrer" className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
+                    <Link to="/ranking" className="bg-white dark:bg-dark-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center gap-2 hover:border-blue-500 transition-colors group">
                         <Trophy size={20} className="text-blue-600 group-hover:scale-110 transition-transform" />
                         <span className="text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300">Ranking</span>
                     </Link>

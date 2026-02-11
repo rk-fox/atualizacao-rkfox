@@ -7,6 +7,7 @@ import { WhalePlanner } from './pages/WhalePlanner';
 import { EfficiencyCalc } from './pages/EfficiencyCalc';
 import { BurnPlanner } from './pages/BurnPlanner';
 import { EventPass } from './pages/EventPass';
+import { Ranking } from './pages/Ranking';
 
 const App: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const App: React.FC = () => {
           <Route path="/efficiency" element={<EfficiencyCalc />} />
           <Route path="/burn" element={<BurnPlanner />} />
           <Route path="/event" element={<EventPass />} />
+          <Route path="/ranking" element={<Ranking />} />
         </Routes>
       </Layout>
     </Router>

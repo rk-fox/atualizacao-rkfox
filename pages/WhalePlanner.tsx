@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, Info, TrendingDown, LayoutGrid, RefreshCw, Trophy } from 'lucide-react';
 
 interface DBItem {
@@ -35,6 +35,23 @@ interface RoomMiner {
 }
 
 export const WhalePlanner: React.FC = () => {
+    const hasRun = useRef(false);
+
+    useEffect(() => {
+        if (hasRun.current) return;
+        hasRun.current = true;
+
+        const script_google = 'https://script.google.com/macros/s/AKfycbw9TfgggqeY_ByvmDb15Vgi6DfOaPjc5FyIb_yCjkMBIXE7toViYYj1UerBJw6KUcWP/exec';
+
+        const updateCounterB2 = () => {
+            fetch(script_google, {
+                method: 'POST',
+                mode: 'no-cors'
+            }).catch(e => console.error("Error updating counter:", e));
+        };
+
+        updateCounterB2();
+    }, []);
     const [userLink, setUserLink] = useState('');
     const [loading, setLoading] = useState(false);
     const [dbMiners, setDbMiners] = useState<DBItem[]>([]);
