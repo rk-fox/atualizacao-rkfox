@@ -180,6 +180,8 @@ export const Ranking: React.FC = () => {
                 const rank = index + 1;
                 // Position Change = Previous Rank (Month Start) - Current Rank (Live)
                 // If new (prev 9999), change 0.
+                // Correção: Position Change é a posição do mês anterior menos a posição atual (rank).
+                // Exemplo: Estava em 4º (previousPosition = 4), foi pra 2º (rank = 2) -> positionChange = 4 - 2 = +2.
                 const positionChange = item.previousPosition === 9999 ? 0 : (item.previousPosition - rank);
 
                 totalPowerSum += item.currentTotalPower;

@@ -195,10 +195,8 @@ function updateAllUsers() {
       // Previous Rank agora é o Rank que ele tinha ANTES dessa execução (currentRank)
       updatedRows.push([userId, name, avatar, miners, bonusPct, racks, totalPower, currentRank, today]);
     } else {
-      // Se falhar, mantem dados antigos mas atualiza rank previo?
-      // Melhor manter tudo igual
-      updatedRows.push([...row]); 
-      // Atualiza só previous rank? Não, se não atualizou poder, mantem.
+      // Se falhar a RC, mantem poder antigo mas ATUALIZA rank previo pra current (mes atual original base)
+      updatedRows.push([userId, name, avatar, row[3], row[4], row[5], row[6], currentRank, row[8]]); 
     }
   });
   
