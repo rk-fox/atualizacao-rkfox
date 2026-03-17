@@ -174,7 +174,7 @@ export const Ranking: React.FC = () => {
 
             // Global Stats
             let totalPowerSum = 0;
-            // let totalInitialSum = 0;
+            let totalInitialSum = 0;
 
             const finalRanked: RankedUser[] = results.map((item, index) => {
                 const rank = index + 1;
@@ -183,7 +183,7 @@ export const Ranking: React.FC = () => {
                 const positionChange = item.previousPosition === 9999 ? 0 : (item.previousPosition - rank);
 
                 totalPowerSum += item.currentTotalPower;
-                // totalInitialSum += item.initialPower;
+                totalInitialSum += item.initialPower;
 
                 return {
                     ...item,
@@ -193,8 +193,7 @@ export const Ranking: React.FC = () => {
             });
 
             // Growth
-            // const growth = totalInitialSum > 0 ? ((totalPowerSum / totalInitialSum) - 1) * 100 : 0;
-            const growth = 0; // Placeholder for now
+            const growth = totalInitialSum > 0 ? ((totalPowerSum / totalInitialSum) - 1) * 100 : 0;
 
             setUsers(finalRanked);
             setGlobalStats({
@@ -310,7 +309,7 @@ export const Ranking: React.FC = () => {
                         Crescimento: <b className={globalStats.growth >= 0 ? 'text-green-500' : 'text-red-500'}>{globalStats.growth.toFixed(2)}%</b>
                     </span>
                     <span className="bg-white dark:bg-dark-800 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-                        Ref: 10/02/2026
+                        Ref: {`01/${String(new Date().getMonth() + 1).padStart(2, '0')}/${new Date().getFullYear()}`}
                     </span>
                 </div>
             </div>
